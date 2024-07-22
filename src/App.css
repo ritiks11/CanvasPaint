@@ -1,38 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Happy+Monkey&display=swap");
+
+.title {
+  font-family: "Happy Monkey", system-ui;
+  font-size: 30px;
+  padding: 10px;
+  color: #fff;
+}
+.toolCanvas {
+  display: flex;
+  gap: 50px;
+}
 .App {
-  text-align: center;
+  scrollbar-width: none;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/*_________________________ToolBar____________________*/
+.toolContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin: 10px;
+  padding: 50px;
+  border: 2px solid;
+  height: fit-content;
+  border-radius: 50px;
+  background-color: #ffcce9;
 }
-
-.App-link {
-  color: #61dafb;
+.colorPickerText {
+  font-family: "Happy Monkey", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 25px;
+  color: black;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.tools {
+  font-family: "Happy Monkey", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  margin-top: 10px;
+}
+.dropDown {
+  font-family: "Happy Monkey", system-ui;
+  font-weight: 400;
+  font-size: 20px;
+  margin-top: 10px;
+  border: 1px solid;
+  border-radius: 50px;
+  width: 200px;
+  padding: 10px;
+}
+.colorPickerBox {
+  width: 150px;
+  height: 30px;
+}
+.toolIcons {
+  width: 20px;
+  height: 20px;
+}
+.thickness {
+  margin-top: 10px;
+}
+.thicknessbar {
+  width: 180px;
+  color: black;
+}
+.fillcolor {
+  margin-top: 10px;
+}
+.fillcolorbox {
+  width: 150px;
+  height: 30px;
+}
+.arrowIcons {
+  color: #694f8e;
 }

@@ -1,23 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Header from "./component/Header";
+import Toolbar from "./component/Toolbar";
+import Canvas from "./component/Canvas";
+import "./App.css";
 
 function App() {
+  const [tool, setTool] = useState("brush");
+  const [color, setColor] = useState("#000000");
+  const [thickness, setThickness] = useState(5);
+  const [fill, setFill] = useState("#ffffff");
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <div className="toolCanvas">
+        <Toolbar
+          tool={tool}
+          setTool={setTool}
+          color={color}
+          setColor={setColor}
+          thickness={thickness}
+          setThickness={setThickness}
+          fill={fill}
+          setFill={setFill}
+        />
+        <Canvas tool={tool} color={color} thickness={thickness} fill={fill} />
+      </div>
     </div>
   );
 }
