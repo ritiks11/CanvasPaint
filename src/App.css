@@ -9,7 +9,7 @@
 }
 .toolCanvas {
   display: flex;
-  gap: 50px;
+  gap: 10px;
 }
 .App {
   scrollbar-width: none;
@@ -89,4 +89,50 @@
   font-weight: 400;
   font-size: 20px;
   color: #fff;
+}
+/*--------------------------------------------------------------------------*/
+@media (max-width: 400px) {
+  .title {
+    font-size: 10px;
+  }
+  .toolCanvas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toolContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    padding: 8px;
+    border-radius: 10px;
+    column-gap: 30px;
+    margin: 5px;
+  }
+  .colorPickerText {
+    font-size: 13px;
+  }
+  .colorPickerBox {
+    margin-top: 10px;
+  }
+  .dropDown {
+    width: 120px;
+    padding: 5px;
+    font-size: 15px;
+  }
+  .tools {
+    margin-top: 0px;
+  }
+  .thicknessbar {
+    width: 150px;
+  }
+  .exportBtn {
+    padding: 8px;
+  }
+  .btnTitle {
+    font-size: 13px;
+  }
+  .canvas-container {
+    touch-action: none; /* Disables touch interactions like scrolling */
+  }
 }

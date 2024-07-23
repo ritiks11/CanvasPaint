@@ -23,33 +23,34 @@ function Toolbar({ tool, setTool, color, setColor, thickness, setThickness }) {
   };
   return (
     <aside className="toolContainer">
-      <p className="colorPickerText">
+      <div className="colorPickerText">
         choose your color!{" "}
         <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
-      </p>
-      <input
-        type="color"
-        value={color}
-        onChange={(e) => setColor(e.target.value)}
-        className="colorPickerBox"
-      />
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+          className="colorPickerBox"
+        />
+      </div>
+
       <div className="tools">
-        <p className="colorPickerText">
+        <div className="colorPickerText">
           use these tools{" "}
           <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
-        </p>
-        <select
-          className="dropDown"
-          value={tool}
-          onChange={(e) => setTool(e.target.value)}
-        >
-          <option value="brush">Brush</option>
-          <option value="rectangle">Rectangle</option>
-          <option value="circle">Circle</option>
-          <option value="line">Line</option>
-          <option value="text">Text</option>
-          <option value="eraser">Eraser</option>
-        </select>
+          <select
+            className="dropDown"
+            value={tool}
+            onChange={(e) => setTool(e.target.value)}
+          >
+            <option value="brush">Brush</option>
+            <option value="rectangle">Rectangle</option>
+            <option value="circle">Circle</option>
+            <option value="line">Line</option>
+            <option value="text">Text</option>
+            <option value="eraser">Eraser</option>
+          </select>
+        </div>
       </div>
 
       <div className="thickness">
