@@ -5,16 +5,7 @@ import { faArrowTurnDown } from "@fortawesome/free-solid-svg-icons";
 import { faPaintBrush } from "@fortawesome/free-solid-svg-icons";
 import { jsPDF } from "jspdf";
 
-function Toolbar({
-  tool,
-  setTool,
-  color,
-  setColor,
-  thickness,
-  setThickness,
-  fill,
-  setFill,
-}) {
+function Toolbar({ tool, setTool, color, setColor, thickness, setThickness }) {
   const canvasRef = useRef(null);
 
   const canvas = canvasRef.current;
@@ -58,7 +49,6 @@ function Toolbar({
           <option value="line">Line</option>
           <option value="text">Text</option>
           <option value="eraser">Eraser</option>
-          <option value="fill">Fill</option>
         </select>
       </div>
 
@@ -77,19 +67,11 @@ function Toolbar({
         />
       </div>
 
-      <div className="fillcolor">
-        <p className="colorPickerText">
-          fill color{" "}
-          <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
-        </p>
-        <input
-          type="color"
-          value={fill}
-          onChange={(e) => setFill(e.target.value)}
-          className="fillcolorbox"
-        />
+      <div className="exportBtn">
+        <button onClick={exportPDF} className="btnTitle">
+          Export as PDF
+        </button>
       </div>
-      <button onClick={exportPDF}>Export as PDF</button>
     </aside>
   );
 }
