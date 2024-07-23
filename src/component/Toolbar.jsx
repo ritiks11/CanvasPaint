@@ -1,31 +1,44 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import "../../src/App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowTurnDown } from "@fortawesome/free-solid-svg-icons";
-import { faPaintBrush } from "@fortawesome/free-solid-svg-icons";
 import { jsPDF } from "jspdf";
 
-function Toolbar({ tool, setTool, color, setColor, thickness, setThickness }) {
-  const canvasRef = useRef(null);
-
-  const canvas = canvasRef.current;
+function Toolbar({
+  tool,
+  setTool,
+  color,
+  setColor,
+  thickness,
+  setThickness,
+  canvasRef,
+}) {
   const exportPDF = () => {
-    const pdf = new jsPDF("landscape");
-    pdf.addImage(
-      canvas.toDataURL("image/png"),
-      "PNG",
-      0,
-      0,
-      pdf.internal.pageSize.width,
-      pdf.internal.pageSize.height
-    );
-    pdf.save("canvas.pdf");
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const pdf = new jsPDF("landscape");
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        0,
+        0,
+        pdf.internal.pageSize.width,
+        pdf.internal.pageSize.height
+      );
+      pdf.save("canvas.pdf");
+    } else {
+      console.error("Canvas reference is not defined.");
+    }
   };
+
   return (
     <aside className="toolContainer">
       <div className="colorPickerText">
-        choose your color!{" "}
-        <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+        <div>
+          choose your color!{" "}
+          <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+        </div>
+
         <input
           type="color"
           value={color}
@@ -36,8 +49,10 @@ function Toolbar({ tool, setTool, color, setColor, thickness, setThickness }) {
 
       <div className="tools">
         <div className="colorPickerText">
-          use these tools{" "}
-          <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+          <div>
+            use these tools{" "}
+            <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+          </div>
           <select
             className="dropDown"
             value={tool}

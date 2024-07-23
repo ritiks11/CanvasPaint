@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "./component/Header";
 import Toolbar from "./component/Toolbar";
 import Canvas from "./component/Canvas";
@@ -8,6 +8,7 @@ function App() {
   const [tool, setTool] = useState("brush");
   const [color, setColor] = useState("#000000");
   const [thickness, setThickness] = useState(5);
+  const canvasRef = useRef(null);
 
   return (
     <div className="App">
@@ -20,8 +21,14 @@ function App() {
           setColor={setColor}
           thickness={thickness}
           setThickness={setThickness}
+          canvasRef={canvasRef}
         />
-        <Canvas tool={tool} color={color} thickness={thickness} />
+        <Canvas
+          tool={tool}
+          color={color}
+          thickness={thickness}
+          canvasRef={canvasRef}
+        />
       </div>
     </div>
   );

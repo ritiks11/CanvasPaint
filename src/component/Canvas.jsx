@@ -4,10 +4,7 @@ import eraser from "../../src/assets/eraser-solid.svg";
 import plus from "../../src/assets/plus-solid.svg";
 import "../../src/App.css";
 
-function Canvas({ tool, color, thickness }) {
-  const width = thickness;
-  const widthHalf = width ? width / 2 : 0;
-  const canvasRef = useRef(null);
+function Canvas({ tool, color, thickness, canvasRef }) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
@@ -17,30 +14,30 @@ function Canvas({ tool, color, thickness }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const viewportWidth = window.outerWidth;
     const viewportHeight = window.outerHeight;
 
     let displayWidth, displayHeight;
 
     if (viewportWidth > 1024) {
-      // Large screens
       displayWidth = 1100;
       displayHeight = 550;
     } else if (viewportWidth > 768) {
-      // Medium screens
       displayWidth = 1000;
       displayHeight = 500;
     } else {
-      // Small screens
       displayWidth = 345;
       displayHeight = 600;
     }
-    canvas.width = displayWidth; // For high-DPI displays
-    canvas.height = displayHeight; // For high-DPI displays
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
     canvas.style.width = `${displayWidth}px`;
     canvas.style.height = `${displayHeight}px`;
     canvas.style.border = `8px solid #000000`;
     canvas.style.background = `white`;
+
     let newCursor = "";
 
     if (tool === "brush") {
@@ -52,17 +49,16 @@ function Canvas({ tool, color, thickness }) {
     }
     setCursor(newCursor);
 
-    // Restore the saved image if there is one
     const ctx = canvas.getContext("2d");
     if (savedImage) {
       const img = new Image();
       img.src = savedImage;
       img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.drawImage(img, 0, 0); // Draw the saved image
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
       };
     }
-  }, [tool, thickness, width, widthHalf, savedImage]);
+  }, [tool, thickness, savedImage]);
 
   const startDrawing = (x, y) => {
     setStartX(x);
@@ -147,8 +143,10 @@ function Canvas({ tool, color, thickness }) {
 
   const saveCanvasState = () => {
     const canvas = canvasRef.current;
-    const savedImage = canvas.toDataURL();
-    setSavedImage(savedImage);
+    if (canvas) {
+      const savedImage = canvas.toDataURL();
+      setSavedImage(savedImage);
+    }
   };
 
   return (
@@ -168,19 +166,19 @@ function Canvas({ tool, color, thickness }) {
           stopDrawing(e.clientX - rect.left, e.clientY - rect.top);
         }}
         onTouchStart={(e) => {
-          e.preventDefault(); // Prevent scrolling
+          e.preventDefault();
           const rect = canvasRef.current.getBoundingClientRect();
           const touch = e.touches[0];
           startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
         }}
         onTouchMove={(e) => {
-          e.preventDefault(); // Prevent scrolling
+          e.preventDefault();
           const rect = canvasRef.current.getBoundingClientRect();
           const touch = e.touches[0];
           draw(touch.clientX - rect.left, touch.clientY - rect.top);
         }}
         onTouchEnd={(e) => {
-          e.preventDefault(); // Prevent scrolling
+          e.preventDefault();
           const rect = canvasRef.current.getBoundingClientRect();
           const touch = e.changedTouches[0];
           stopDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
