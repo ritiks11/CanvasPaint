@@ -9,6 +9,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [cursor, setCursor] = useState("");
+  const [hasInput, setHasInput] = useState(false);
   const [savedImage, setSavedImage] = useState(null);
 
   useEffect(() => {
@@ -64,8 +65,9 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     setStartY(y);
     setIsDrawing(true);
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    if (tool === "text") {
+      addInput(x, y);
+    }
   };
 
   const draw = (x, y) => {
@@ -133,6 +135,76 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     }
   };
 
+  const addInput = (x, y) => {
+    if (hasInput) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const input = document.createElement("input");
+
+    input.type = "text";
+    input.style.position = "absolute";
+
+    // Adjust position to keep input box within canvas bounds
+    const inputX = Math.min(rect.left + x, rect.right - 200); // 100 is a rough estimate for input width
+    const inputY = Math.min(rect.top + y, rect.bottom - 20); // 20 is the height of the input box
+
+    input.style.left = `${inputX}px`;
+    input.style.top = `${inputY}px`;
+    input.style.font = "25px 'Happy Monkey', system-ui";
+    input.style.border = "1px solid #000";
+    input.style.outline = "none";
+    input.style.padding = "2px";
+    input.style.margin = "0";
+    input.style.background = "transparent";
+    input.style.width = "100px";
+    input.style.minWidth = "1ch";
+
+    input.onkeydown = handleEnter;
+    input.oninput = handleInput;
+
+    document.body.appendChild(input);
+    input.focus();
+
+    setHasInput(true);
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+
+      drawText(
+        e.target.value,
+        parseInt(e.target.style.left, 10),
+        parseInt(e.target.style.top, 10)
+      );
+      document.body.removeChild(e.target);
+      setHasInput(false);
+      saveCanvasState();
+    }
+  };
+
+  const handleInput = (e) => {
+    const textLength = e.target.value.length;
+    e.target.style.width = `${textLength + 1}ch`;
+  };
+
+  const drawText = (text, x, y) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    // Adjust the coordinates to be relative to the canvas
+    const rect = canvas.getBoundingClientRect();
+    const adjustedX = x - rect.left;
+    const adjustedY = y - rect.top;
+
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left";
+    ctx.font = "25px 'Happy Monkey', system-ui";
+    ctx.fillText(text, adjustedX, adjustedY);
+  };
+
   const saveCanvasState = () => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -144,6 +216,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
   return (
     <div className="canvas-container">
       <canvas
+        id="myCanvas"
         ref={canvasRef}
         onMouseDown={(e) => {
           const rect = canvasRef.current.getBoundingClientRect();
