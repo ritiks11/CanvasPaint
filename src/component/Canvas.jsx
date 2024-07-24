@@ -8,7 +8,6 @@ function Canvas({ tool, color, thickness, canvasRef }) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
-  const [text, setText] = useState("");
   const [cursor, setCursor] = useState("");
   const [savedImage, setSavedImage] = useState(null);
 
@@ -67,13 +66,6 @@ function Canvas({ tool, color, thickness, canvasRef }) {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
-    if (tool === "text") {
-      ctx.fillStyle = color;
-      ctx.font = `${thickness * 2}px Arial`;
-      ctx.fillText(text, x, y);
-      saveCanvasState();
-    }
   };
 
   const draw = (x, y) => {
@@ -185,14 +177,6 @@ function Canvas({ tool, color, thickness, canvasRef }) {
         }}
         style={{ cursor }}
       />
-      {tool === "text" && (
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Enter text"
-        />
-      )}
     </div>
   );
 }

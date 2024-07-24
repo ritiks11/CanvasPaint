@@ -62,7 +62,6 @@ function Toolbar({
             <option value="rectangle">Rectangle</option>
             <option value="circle">Circle</option>
             <option value="line">Line</option>
-            <option value="text">Text</option>
             <option value="eraser">Eraser</option>
           </select>
         </div>

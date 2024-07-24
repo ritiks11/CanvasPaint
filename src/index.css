@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #694f8e;
+  background: linear-gradient(to right, #ffb800, #ffa004, #ff8709);
 }
 input,
 button,

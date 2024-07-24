@@ -1,11 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Happy+Monkey&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 .title {
-  font-family: "Happy Monkey", system-ui;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
   font-size: 30px;
   padding: 10px;
   color: #fff;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 .toolCanvas {
   display: flex;
@@ -20,17 +23,18 @@
   flex-direction: column;
   margin: 10px;
   padding: 40px;
-  border: 2px solid;
+  border: 8px solid #fff;
   height: fit-content;
-  border-radius: 50px;
-  background-color: #ffcce9;
+  border-radius: 30px;
+  background-color: #ffde4d;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 .colorPickerText {
   font-family: "Happy Monkey", system-ui;
   font-weight: 400;
   font-style: normal;
   font-size: 25px;
-  color: black;
+  color: #000;
 }
 .tools {
   font-family: "Happy Monkey", system-ui;
@@ -74,7 +78,7 @@
   color: #694f8e;
 }
 .exportBtn {
-  background-color: #640d6b;
+  background-color: #ff8f00;
   width: fit-content;
   padding: 10px;
   margin-top: 20px;
@@ -88,7 +92,7 @@
   font-family: "Happy Monkey", system-ui;
   font-weight: 400;
   font-size: 20px;
-  color: #fff;
+  color: #000;
 }
 /*--------------------------------------------------------------------------*/
 @media (max-width: 700px) {
