@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import brush from "../../src/assets/paintbrush-solid.svg";
 import eraser from "../../src/assets/eraser-solid.svg";
-import plus from "../../src/assets/plus-solid.svg";
+import plus from "../../src/assets/arrow-pointer-solid.svg";
 import "../../src/App.css";
 
 function Canvas({ tool, color, thickness, canvasRef }) {
@@ -146,7 +146,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     input.style.position = "absolute";
 
     // Adjust position to keep input box within canvas bounds
-    const inputX = Math.min(rect.left + x, rect.right - 200); // 100 is a rough estimate for input width
+    const inputX = Math.min(rect.left + x, rect.right - 100); // 100 is a rough estimate for input width
     const inputY = Math.min(rect.top + y, rect.bottom - 20); // 20 is the height of the input box
 
     input.style.left = `${inputX}px`;
@@ -157,7 +157,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     input.style.padding = "2px";
     input.style.margin = "0";
     input.style.background = "transparent";
-    input.style.width = "100px";
+    input.style.width = "50px";
     input.style.minWidth = "1ch";
 
     input.onkeydown = handleEnter;

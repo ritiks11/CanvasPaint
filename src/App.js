@@ -7,7 +7,7 @@ import "./App.css";
 function App() {
   const [tool, setTool] = useState("brush");
   const [color, setColor] = useState("#000000");
-  const [thickness, setThickness] = useState(5);
+  const [thickness, setThickness] = useState(3);
   const canvasRef = useRef(null);
 
   return (

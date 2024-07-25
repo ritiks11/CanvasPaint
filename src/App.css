@@ -8,7 +8,7 @@
   padding: 10px;
   color: #fff;
   text-transform: uppercase;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
 }
 .toolCanvas {
   display: flex;
@@ -47,7 +47,7 @@
   font-weight: 400;
   font-size: 20px;
   margin-top: 10px;
-  border: 3px solid #640d6b;
+  border: 3px solid #eb5b00;
   border-radius: 50px;
   width: 200px;
   padding: 10px;
@@ -75,7 +75,7 @@
   height: 30px;
 }
 .arrowIcons {
-  color: #694f8e;
+  color: #eb5b00;
 }
 .exportBtn {
   background-color: #ff8f00;
@@ -98,7 +98,8 @@
 /*--------------------------------------------------------------------------*/
 @media (max-width: 700px) {
   .title {
-    font-size: 10px;
+    font-size: 15px;
+    /* text-align: center; */
   }
   .toolCanvas {
     display: flex;
@@ -116,6 +117,7 @@
     justify-content: center;
     padding: 8px;
     border-radius: 10px;
+    border: 7px solid #fff;
     column-gap: 30px;
     margin: 5px;
   }
