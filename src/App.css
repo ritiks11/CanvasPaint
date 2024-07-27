@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Happy+Monkey&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 .title {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Happy Monkey", system-ui;
   font-weight: 500;
   font-size: 30px;
   padding: 10px;
