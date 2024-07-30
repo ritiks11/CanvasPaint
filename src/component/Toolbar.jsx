@@ -12,6 +12,7 @@ function Toolbar({
   thickness,
   setThickness,
   canvasRef,
+  setIsModalOpen,
 }) {
   const exportPDF = () => {
     const canvas = canvasRef.current;
@@ -35,10 +36,9 @@ function Toolbar({
     <aside className="toolContainer">
       <div className="colorPickerText">
         <div>
-          choose your color!{" "}
+          Choose your color!{" "}
           <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
         </div>
-
         <input
           type="color"
           value={color}
@@ -50,7 +50,7 @@ function Toolbar({
       <div className="tools">
         <div className="colorPickerText">
           <div>
-            use these tools{" "}
+            Use these tools{" "}
             <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
           </div>
           <select
@@ -81,6 +81,12 @@ function Toolbar({
           onChange={(e) => setThickness(e.target.value)}
           className="thicknessbar"
         />
+      </div>
+
+      <div className="uploadBtn">
+        <button onClick={() => setIsModalOpen(true)} className="btnTitle">
+          Upload SVG file
+        </button>
       </div>
 
       <div className="exportBtn">

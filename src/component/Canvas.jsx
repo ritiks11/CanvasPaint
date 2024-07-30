@@ -1,24 +1,28 @@
 import React, { useRef, useState, useEffect } from "react";
-import brush from "../../src/assets/paintbrush-solid.svg";
-import eraser from "../../src/assets/eraser-solid.svg";
-import plus from "../../src/assets/arrow-pointer-solid.svg";
+import * as fabric from "fabric"; // v6
 import "../../src/App.css";
 
-function Canvas({ tool, color, thickness, canvasRef }) {
+function Canvas({
+  tool,
+  color,
+  thickness,
+  canvasRef,
+  isModalOpen,
+  setIsModalOpen,
+}) {
+  const [fabricCanvas, setFabricCanvas] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [startY, setStartY] = useState(0);
-  const [cursor, setCursor] = useState("");
   const [hasInput, setHasInput] = useState(false);
-  const [savedImage, setSavedImage] = useState(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvasRef.current || fabricCanvas) return;
+
+    const canvasElement = canvasRef.current;
+    const fabricCanvasInstance = new fabric.Canvas(canvasElement);
+    setFabricCanvas(fabricCanvasInstance);
 
     const viewportWidth = window.outerWidth;
     const viewportHeight = window.outerHeight;
-
     let displayWidth, displayHeight;
 
     if (viewportWidth > 1024) {
@@ -31,108 +35,203 @@ function Canvas({ tool, color, thickness, canvasRef }) {
       displayWidth = 345;
       displayHeight = 600;
     }
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
-    canvas.style.width = `${displayWidth}px`;
-    canvas.style.height = `${displayHeight}px`;
-    canvas.style.border = `8px solid #000000`;
-    canvas.style.background = `white`;
 
-    let newCursor = "";
+    fabricCanvasInstance.setWidth(displayWidth);
+    fabricCanvasInstance.setHeight(displayHeight);
+    fabricCanvasInstance.set("backgroundColor", "white");
+    fabricCanvasInstance.renderAll();
 
-    if (tool === "brush") {
-      newCursor = `url(${brush}) 0 0, auto`;
-    } else if (tool === "eraser") {
-      newCursor = `url(${eraser}) 0 0, auto`;
-    } else {
-      newCursor = `url(${plus}) 0 0, auto`;
-    }
-    setCursor(newCursor);
+    return () => {
+      fabricCanvasInstance.dispose();
+      setFabricCanvas(null);
+    };
+  }, [canvasRef]);
 
-    const ctx = canvas.getContext("2d");
-    if (savedImage) {
-      const img = new Image();
-      img.src = savedImage;
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-      };
-    }
-  }, [tool, thickness, savedImage]);
+  useEffect(() => {
+    if (!fabricCanvas) return;
 
-  const startDrawing = (x, y) => {
-    setStartX(x);
-    setStartY(y);
-    setIsDrawing(true);
+    let shape;
+    fabricCanvas.off("mouse:down");
+    fabricCanvas.off("mouse:move");
+    fabricCanvas.off("mouse:up");
 
-    if (tool === "text") {
-      addInput(x, y);
-    }
-  };
-
-  const draw = (x, y) => {
-    if (!isDrawing) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    if (tool === "brush") {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = thickness;
-      ctx.lineCap = "round";
-
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-    } else if (tool === "eraser") {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.strokeStyle = "rgba(0,0,0,1)";
-      ctx.lineWidth = thickness;
-
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.globalCompositeOperation = "source-over";
-    }
-  };
-
-  const stopDrawing = (x, y) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    if (isDrawing) {
-      if (tool === "rectangle" || tool === "circle" || tool === "line") {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = thickness;
-
-        if (tool === "rectangle") {
-          const width = x - startX;
-          const height = y - startY;
-          ctx.strokeRect(startX, startY, width, height);
-        }
-
-        if (tool === "circle") {
-          const radius = Math.sqrt(
-            Math.pow(x - startX, 2) + Math.pow(y - startY, 2)
-          );
-          ctx.beginPath();
-          ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-          ctx.stroke();
-        }
-
-        if (tool === "line") {
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(x, y);
-          ctx.stroke();
-        }
+    const addShape = (options) => {
+      const pointer = fabricCanvas.getPointer(options.e);
+      if (tool === "rectangle") {
+        shape = new fabric.Rect({
+          left: pointer.x,
+          top: pointer.y,
+          width: 0,
+          height: 0,
+          fill: "transparent", // No fill
+          selectable: true,
+          stroke: color,
+          strokeWidth: thickness,
+        });
+      } else if (tool === "circle") {
+        shape = new fabric.Circle({
+          left: pointer.x,
+          top: pointer.y,
+          radius: 0,
+          fill: "transparent", // No fill
+          selectable: true,
+          stroke: color,
+          strokeWidth: thickness,
+        });
+      } else if (tool === "line") {
+        shape = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+          stroke: color,
+          strokeWidth: thickness,
+          selectable: true,
+        });
       }
+      if (shape) {
+        fabricCanvas.add(shape);
+      }
+    };
+
+    const updateShape = (options) => {
+      const pointer = fabricCanvas.getPointer(options.e);
+      if (shape) {
+        if (tool === "rectangle") {
+          shape.set({
+            width: pointer.x - shape.left,
+            height: pointer.y - shape.top,
+          });
+        } else if (tool === "circle") {
+          const radius = Math.sqrt(
+            Math.pow(pointer.x - shape.left, 2) +
+              Math.pow(pointer.y - shape.top, 2)
+          );
+          shape.set({ radius });
+        } else if (tool === "line") {
+          shape.set({ x2: pointer.x, y2: pointer.y });
+        }
+        fabricCanvas.renderAll();
+      }
+    };
+
+    fabricCanvas.on("mouse:down", (options) => {
+      const pointer = fabricCanvas.getPointer(options.e);
+
+      if (tool === "text" && !hasInput) {
+        addInput(pointer.x, pointer.y);
+        return;
+      }
+
+      if (fabricCanvas.getActiveObject() || isDrawing) {
+        return;
+      }
+      setIsDrawing(true);
+      addShape(options);
+      fabricCanvas.on("mouse:move", updateShape);
+    });
+
+    fabricCanvas.on("mouse:up", () => {
       setIsDrawing(false);
-      ctx.beginPath();
-      saveCanvasState();
+      shape = null;
+      fabricCanvas.off("mouse:move", updateShape);
+    });
+
+    fabricCanvas.on("object:selected", () => {
+      setIsDrawing(false);
+    });
+
+    // Brush tool
+    if (tool === "brush") {
+      fabricCanvas.isDrawingMode = true;
+      if (!fabricCanvas.freeDrawingBrush) {
+        fabricCanvas.freeDrawingBrush = new fabric.PencilBrush(fabricCanvas);
+      }
+      fabricCanvas.freeDrawingBrush.color = color;
+      fabricCanvas.freeDrawingBrush.width = thickness;
+    } else if (tool === "eraser") {
+      fabricCanvas.isDrawingMode = true;
+      if (!fabricCanvas.freeDrawingBrush) {
+        fabricCanvas.freeDrawingBrush = new fabric.PencilBrush(fabricCanvas);
+      }
+      fabricCanvas.freeDrawingBrush.color = fabricCanvas.backgroundColor;
+      fabricCanvas.freeDrawingBrush.width = thickness;
+    } else {
+      fabricCanvas.isDrawingMode = false;
     }
+  }, [fabricCanvas, tool, color, thickness]);
+
+  const handleSVGUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const svgString = e.target.result;
+        console.log("SVG String:", svgString);
+
+        fabric.loadSVGFromString(
+          svgString,
+          (objects, options) => {
+            console.log("Parsed Objects:", objects);
+            console.log("Parsed Options:", options);
+
+            if (!objects) {
+              console.error(
+                "SVG parsing failed or resulted in an undefined or null value."
+              );
+              return;
+            }
+
+            try {
+              let obj;
+              if (Array.isArray(objects)) {
+                console.log("Objects is an array:", objects);
+                obj = fabric.util.groupSVGElements(objects, options);
+              } else if (objects.type) {
+                console.log("Objects is a single object:", objects);
+                obj = objects;
+              } else {
+                console.error(
+                  "The parsed objects are not in an array or object format."
+                );
+                return;
+              }
+
+              obj.set({
+                left: fabricCanvas.getWidth() / 2 - options.width / 2,
+                top: fabricCanvas.getHeight() / 2 - options.height / 2,
+                selectable: true,
+              });
+              fabricCanvas.add(obj).renderAll();
+            } catch (error) {
+              console.error("Error grouping SVG elements:", error);
+            }
+          },
+          (item, object) => {
+            console.log("Item:", item);
+            console.log("Object:", object);
+          }
+        );
+
+        setIsModalOpen(false);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      const text = new fabric.Text(e.target.value, {
+        left: parseFloat(e.target.style.left),
+        top: parseFloat(e.target.style.top),
+        fontSize: thickness,
+        fill: color,
+        selectable: true,
+      });
+      fabricCanvas.add(text);
+      document.body.removeChild(e.target);
+      setHasInput(false);
+    }
+  };
+
+  const handleInput = (e) => {
+    e.target.style.width = `${e.target.value.length + 1}ch`;
   };
 
   const addInput = (x, y) => {
@@ -143,11 +242,11 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     const input = document.createElement("input");
 
     input.type = "text";
+    input.className = "canvas-input"; // Ensure this class is in your CSS
     input.style.position = "absolute";
 
-    // Adjust position to keep input box within canvas bounds
-    const inputX = Math.min(rect.left + x, rect.right - 100); // 100 is a rough estimate for input width
-    const inputY = Math.min(rect.top + y, rect.bottom - 20); // 20 is the height of the input box
+    const inputX = rect.left + x;
+    const inputY = rect.top + y;
 
     input.style.left = `${inputX}px`;
     input.style.top = `${inputY}px`;
@@ -169,87 +268,26 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     setHasInput(true);
   };
 
-  const handleEnter = (e) => {
-    if (e.key === "Enter") {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-
-      drawText(
-        e.target.value,
-        parseInt(e.target.style.left, 10),
-        parseInt(e.target.style.top, 10)
-      );
-      document.body.removeChild(e.target);
-      setHasInput(false);
-      saveCanvasState();
-    }
-  };
-
-  const handleInput = (e) => {
-    const textLength = e.target.value.length;
-    e.target.style.width = `${textLength + 1}ch`;
-  };
-
-  const drawText = (text, x, y) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    // Adjust the coordinates to be relative to the canvas
-    const rect = canvas.getBoundingClientRect();
-    const adjustedX = x - rect.left;
-    const adjustedY = y - rect.top;
-
-    ctx.textBaseline = "top";
-    ctx.textAlign = "left";
-    ctx.font = "25px 'Happy Monkey', system-ui";
-    ctx.fillText(text, adjustedX, adjustedY);
-  };
-
-  const saveCanvasState = () => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const savedImage = canvas.toDataURL();
-      setSavedImage(savedImage);
-    }
-  };
-
   return (
-    <div className="canvas-container">
-      <canvas
-        id="myCanvas"
-        ref={canvasRef}
-        onMouseDown={(e) => {
-          const rect = canvasRef.current.getBoundingClientRect();
-          startDrawing(e.clientX - rect.left, e.clientY - rect.top);
-        }}
-        onMouseMove={(e) => {
-          const rect = canvasRef.current.getBoundingClientRect();
-          draw(e.clientX - rect.left, e.clientY - rect.top);
-        }}
-        onMouseUp={(e) => {
-          const rect = canvasRef.current.getBoundingClientRect();
-          stopDrawing(e.clientX - rect.left, e.clientY - rect.top);
-        }}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          const rect = canvasRef.current.getBoundingClientRect();
-          const touch = e.touches[0];
-          startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
-        }}
-        onTouchMove={(e) => {
-          e.preventDefault();
-          const rect = canvasRef.current.getBoundingClientRect();
-          const touch = e.touches[0];
-          draw(touch.clientX - rect.left, touch.clientY - rect.top);
-        }}
-        onTouchEnd={(e) => {
-          e.preventDefault();
-          const rect = canvasRef.current.getBoundingClientRect();
-          const touch = e.changedTouches[0];
-          stopDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
-        }}
-        style={{ cursor }}
-      />
+    <div className="canvas-container" style={{ position: "relative" }}>
+      <canvas id="myCanvas" className="canvasContainer" ref={canvasRef} />
+
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setIsModalOpen(false)}>
+              &times;
+            </span>
+            <h2>Upload SVG</h2>
+            <input
+              type="file"
+              accept="image/svg+xml"
+              onChange={handleSVGUpload}
+              className="svgInputBox"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
