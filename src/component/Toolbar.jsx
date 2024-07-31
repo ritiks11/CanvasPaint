@@ -12,7 +12,6 @@ function Toolbar({
   thickness,
   setThickness,
   canvasRef,
-  setIsModalOpen,
 }) {
   const exportPDF = () => {
     const canvas = canvasRef.current;
@@ -81,12 +80,6 @@ function Toolbar({
           onChange={(e) => setThickness(e.target.value)}
           className="thicknessbar"
         />
-      </div>
-
-      <div className="uploadBtn">
-        <button onClick={() => setIsModalOpen(true)} className="btnTitle">
-          Upload SVG file
-        </button>
       </div>
 
       <div className="exportBtn">

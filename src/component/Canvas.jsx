@@ -2,14 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import * as fabric from "fabric"; // v6
 import "../../src/App.css";
 
-function Canvas({
-  tool,
-  color,
-  thickness,
-  canvasRef,
-  isModalOpen,
-  setIsModalOpen,
-}) {
+function Canvas({ tool, color, thickness, canvasRef }) {
   const [fabricCanvas, setFabricCanvas] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasInput, setHasInput] = useState(false);
@@ -157,64 +150,6 @@ function Canvas({
     }
   }, [fabricCanvas, tool, color, thickness]);
 
-  const handleSVGUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const svgString = e.target.result;
-        console.log("SVG String:", svgString);
-
-        fabric.loadSVGFromString(
-          svgString,
-          (objects, options) => {
-            console.log("Parsed Objects:", objects);
-            console.log("Parsed Options:", options);
-
-            if (!objects) {
-              console.error(
-                "SVG parsing failed or resulted in an undefined or null value."
-              );
-              return;
-            }
-
-            try {
-              let obj;
-              if (Array.isArray(objects)) {
-                console.log("Objects is an array:", objects);
-                obj = fabric.util.groupSVGElements(objects, options);
-              } else if (objects.type) {
-                console.log("Objects is a single object:", objects);
-                obj = objects;
-              } else {
-                console.error(
-                  "The parsed objects are not in an array or object format."
-                );
-                return;
-              }
-
-              obj.set({
-                left: fabricCanvas.getWidth() / 2 - options.width / 2,
-                top: fabricCanvas.getHeight() / 2 - options.height / 2,
-                selectable: true,
-              });
-              fabricCanvas.add(obj).renderAll();
-            } catch (error) {
-              console.error("Error grouping SVG elements:", error);
-            }
-          },
-          (item, object) => {
-            console.log("Item:", item);
-            console.log("Object:", object);
-          }
-        );
-
-        setIsModalOpen(false);
-      };
-      reader.readAsText(file);
-    }
-  };
-
   const handleEnter = (e) => {
     if (e.key === "Enter") {
       const text = new fabric.Text(e.target.value, {
@@ -271,23 +206,6 @@ function Canvas({
   return (
     <div className="canvas-container" style={{ position: "relative" }}>
       <canvas id="myCanvas" className="canvasContainer" ref={canvasRef} />
-
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setIsModalOpen(false)}>
-              &times;
-            </span>
-            <h2>Upload SVG</h2>
-            <input
-              type="file"
-              accept="image/svg+xml"
-              onChange={handleSVGUpload}
-              className="svgInputBox"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

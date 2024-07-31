@@ -124,45 +124,6 @@
   background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
 }
 
-/* Modal content */
-.modal-content {
-  background-color: #ffde4d;
-  margin: auto;
-  padding: 20px;
-  border: 8px solid #fff;
-  border-radius: 20px;
-  width: 50%;
-  max-width: 500px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  animation-name: animateTop;
-  animation-duration: 0.4s;
-  font-family: "Happy Monkey", system-ui;
-  font-weight: 400;
-  font-size: 20px;
-  text-align: center;
-}
-
-.svgInputBox {
-  font-family: "Happy Monkey", system-ui;
-  font-weight: 400;
-  font-size: 20px;
-}
-
-/* Close button */
-.close {
-  color: #000;
-  float: right;
-  font-size: 40px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
 /* Animation for the modal */
 @keyframes animateTop {
   from {
