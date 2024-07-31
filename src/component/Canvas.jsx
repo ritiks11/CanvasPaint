@@ -1,17 +1,20 @@
 import React, { useRef, useState, useEffect } from "react";
-import * as fabric from "fabric"; // v6
+import * as fabric from "fabric";
 import "../../src/App.css";
 
 function Canvas({ tool, color, thickness, canvasRef }) {
   const [fabricCanvas, setFabricCanvas] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasInput, setHasInput] = useState(false);
+  const [currentTool, setCurrentTool] = useState(null); // Default tool set to null
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvasElement = canvasRef.current;
     const fabricCanvasInstance = new fabric.Canvas(canvasElement);
+
     setFabricCanvas(fabricCanvasInstance);
 
     const viewportWidth = window.outerWidth;
@@ -50,28 +53,28 @@ function Canvas({ tool, color, thickness, canvasRef }) {
 
     const addShape = (options) => {
       const pointer = fabricCanvas.getPointer(options.e);
-      if (tool === "rectangle") {
+      if (currentTool === "rectangle") {
         shape = new fabric.Rect({
           left: pointer.x,
           top: pointer.y,
           width: 0,
           height: 0,
-          fill: "transparent", // No fill
+          fill: "transparent",
           selectable: true,
           stroke: color,
           strokeWidth: thickness,
         });
-      } else if (tool === "circle") {
+      } else if (currentTool === "circle") {
         shape = new fabric.Circle({
           left: pointer.x,
           top: pointer.y,
           radius: 0,
-          fill: "transparent", // No fill
+          fill: "transparent",
           selectable: true,
           stroke: color,
           strokeWidth: thickness,
         });
-      } else if (tool === "line") {
+      } else if (currentTool === "line") {
         shape = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
           stroke: color,
           strokeWidth: thickness,
@@ -86,18 +89,18 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     const updateShape = (options) => {
       const pointer = fabricCanvas.getPointer(options.e);
       if (shape) {
-        if (tool === "rectangle") {
+        if (currentTool === "rectangle") {
           shape.set({
             width: pointer.x - shape.left,
             height: pointer.y - shape.top,
           });
-        } else if (tool === "circle") {
+        } else if (currentTool === "circle") {
           const radius = Math.sqrt(
             Math.pow(pointer.x - shape.left, 2) +
               Math.pow(pointer.y - shape.top, 2)
           );
           shape.set({ radius });
-        } else if (tool === "line") {
+        } else if (currentTool === "line") {
           shape.set({ x2: pointer.x, y2: pointer.y });
         }
         fabricCanvas.renderAll();
@@ -107,7 +110,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     fabricCanvas.on("mouse:down", (options) => {
       const pointer = fabricCanvas.getPointer(options.e);
 
-      if (tool === "text" && !hasInput) {
+      if (currentTool === "text" && !hasInput) {
         addInput(pointer.x, pointer.y);
         return;
       }
@@ -130,25 +133,30 @@ function Canvas({ tool, color, thickness, canvasRef }) {
       setIsDrawing(false);
     });
 
-    // Brush tool
-    if (tool === "brush") {
+    // Apply current tool settings
+    if (currentTool === "brush" || currentTool === "eraser") {
       fabricCanvas.isDrawingMode = true;
       if (!fabricCanvas.freeDrawingBrush) {
         fabricCanvas.freeDrawingBrush = new fabric.PencilBrush(fabricCanvas);
       }
-      fabricCanvas.freeDrawingBrush.color = color;
-      fabricCanvas.freeDrawingBrush.width = thickness;
-    } else if (tool === "eraser") {
-      fabricCanvas.isDrawingMode = true;
-      if (!fabricCanvas.freeDrawingBrush) {
-        fabricCanvas.freeDrawingBrush = new fabric.PencilBrush(fabricCanvas);
-      }
-      fabricCanvas.freeDrawingBrush.color = fabricCanvas.backgroundColor;
+      fabricCanvas.freeDrawingBrush.color =
+        currentTool === "brush" ? color : fabricCanvas.backgroundColor;
       fabricCanvas.freeDrawingBrush.width = thickness;
     } else {
       fabricCanvas.isDrawingMode = false;
     }
-  }, [fabricCanvas, tool, color, thickness]);
+
+    // Handle tool switching
+    return () => {
+      fabricCanvas.isDrawingMode = false;
+    };
+  }, [fabricCanvas, currentTool, color, thickness]);
+
+  useEffect(() => {
+    if (tool) {
+      setCurrentTool(tool); // Update tool based on props
+    }
+  }, [tool]);
 
   const handleEnter = (e) => {
     if (e.key === "Enter") {
@@ -177,7 +185,7 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     const input = document.createElement("input");
 
     input.type = "text";
-    input.className = "canvas-input"; // Ensure this class is in your CSS
+    input.className = "canvas-input";
     input.style.position = "absolute";
 
     const inputX = rect.left + x;
@@ -203,8 +211,59 @@ function Canvas({ tool, color, thickness, canvasRef }) {
     setHasInput(true);
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const dataURL = event.target.result;
+
+      if (file.type.startsWith("image/")) {
+        const imageElement = new Image();
+        imageElement.src = dataURL;
+        imageElement.onload = () => {
+          const img = new fabric.Image(imageElement);
+          img.set({
+            selectable: true,
+            hasControls: true,
+            hasBorders: true,
+            lockScalingFlip: true,
+          });
+          fabricCanvas.add(img);
+          fabricCanvas.setActiveObject(img);
+          fabricCanvas.renderAll();
+          setCurrentTool("selection"); // Switch to "selection" tool after adding image
+        };
+      } else if (file.type === "image/svg+xml") {
+        fabric.loadSVGFromURL(dataURL, (objects, options) => {
+          const svg = fabric.util.groupSVGElements(objects, options);
+          svg.set({
+            selectable: true,
+            hasControls: true,
+            hasBorders: true,
+          });
+          fabricCanvas.add(svg);
+          fabricCanvas.setActiveObject(svg);
+          fabricCanvas.renderAll();
+          setCurrentTool("selection"); // Switch to "selection" tool after adding SVG
+        });
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="canvas-container" style={{ position: "relative" }}>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input
+          type="file"
+          accept="image/*,image/svg+xml"
+          onChange={handleFileUpload}
+        />
+      </form>
       <canvas id="myCanvas" className="canvasContainer" ref={canvasRef} />
     </div>
   );
