@@ -138,7 +138,39 @@ button {
   width: 100px;
   min-width: 1ch;
 }
-
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.fileInput {
+  background-color: #ff8f00;
+  width: fit-content;
+  padding: 10px;
+  margin-top: 20px;
+  border: 3px solid #000;
+  border-radius: 50px;
+  font-family: "Happy Monkey", system-ui;
+  font-weight: 400;
+  font-size: 20px;
+  cursor: pointer;
+}
+.fileInput input[type="file"] {
+  display: none;
+}
+.fileInput label {
+  cursor: pointer;
+}
+.uploadPrompt {
+  font-family: "Happy Monkey", system-ui;
+  font-weight: 600;
+  font-size: 25px;
+  color: #000;
+  text-align: center;
+  margin-top: 30px;
+}
 /*--------------------------------------------------------------------------*/
 @media (max-width: 700px) {
   .title {

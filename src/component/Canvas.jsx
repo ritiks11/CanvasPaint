@@ -257,14 +257,16 @@ function Canvas({ tool, color, thickness, canvasRef }) {
 
   return (
     <div className="canvas-container" style={{ position: "relative" }}>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <canvas id="myCanvas" className="canvasContainer" ref={canvasRef} />
+      <form className="fileInput" onSubmit={(e) => e.preventDefault()}>
         <input
+          id="file-upload"
           type="file"
           accept="image/*,image/svg+xml"
           onChange={handleFileUpload}
         />
+        <label htmlFor="file-upload">Upload File</label>
       </form>
-      <canvas id="myCanvas" className="canvasContainer" ref={canvasRef} />
     </div>
   );
 }

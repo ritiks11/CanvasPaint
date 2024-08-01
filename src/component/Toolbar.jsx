@@ -2,6 +2,7 @@ import React from "react";
 import "../../src/App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowTurnDown } from "@fortawesome/free-solid-svg-icons";
+import { faArrowTurnUp } from "@fortawesome/free-solid-svg-icons";
 import { jsPDF } from "jspdf";
 
 function Toolbar({
@@ -32,62 +33,70 @@ function Toolbar({
   };
 
   return (
-    <aside className="toolContainer">
-      <div className="colorPickerText">
-        <div>
-          Choose your color!{" "}
-          <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
-        </div>
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          className="colorPickerBox"
-        />
+    <div>
+      <div className="title">
+        <h1>Draw it out!</h1>
       </div>
-
-      <div className="tools">
+      <aside className="toolContainer">
         <div className="colorPickerText">
           <div>
-            Use these tools{" "}
+            Choose your color!{" "}
             <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
           </div>
-          <select
-            className="dropDown"
-            value={tool}
-            onChange={(e) => setTool(e.target.value)}
-          >
-            <option value="brush">Brush</option>
-            <option value="rectangle">Rectangle</option>
-            <option value="circle">Circle</option>
-            <option value="line">Line</option>
-            <option value="text">Text</option>
-            <option value="eraser">Eraser</option>
-          </select>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="colorPickerBox"
+          />
         </div>
-      </div>
 
-      <div className="thickness">
-        <p className="colorPickerText">
-          Thickness{" "}
-          <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
-        </p>
-        <input
-          type="range"
-          min="1"
-          max="50"
-          value={thickness}
-          onChange={(e) => setThickness(e.target.value)}
-          className="thicknessbar"
-        />
-      </div>
+        <div className="tools">
+          <div className="colorPickerText">
+            <div>
+              Use these tools{" "}
+              <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+            </div>
+            <select
+              className="dropDown"
+              value={tool}
+              onChange={(e) => setTool(e.target.value)}
+            >
+              <option value="brush">Brush</option>
+              <option value="rectangle">Rectangle</option>
+              <option value="circle">Circle</option>
+              <option value="line">Line</option>
+              <option value="text">Text</option>
+              <option value="eraser">Eraser</option>
+            </select>
+          </div>
+        </div>
 
-      <div className="exportBtn">
-        <button onClick={exportPDF} className="btnTitle">
-          Export as PDF
-        </button>
-      </div>
-    </aside>
+        <div className="thickness">
+          <p className="colorPickerText">
+            Thickness{" "}
+            <FontAwesomeIcon icon={faArrowTurnDown} className="arrowIcons" />
+          </p>
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={thickness}
+            onChange={(e) => setThickness(e.target.value)}
+            className="thicknessbar"
+          />
+        </div>
+
+        <div className="exportBtn">
+          <button onClick={exportPDF} className="btnTitle">
+            Export as PDF
+          </button>
+        </div>
+      </aside>
+      <h3 className="uploadPrompt">
+        Upload your own file! <br></br> (svg, png etc)
+      </h3>
+    </div>
   );
 }
 

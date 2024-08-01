@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      {/* <Header /> */}
       <div className="toolCanvas">
         <Toolbar
           tool={tool}
